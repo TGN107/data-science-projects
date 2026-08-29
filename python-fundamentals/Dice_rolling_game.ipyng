@@ -1,0 +1,21 @@
+import random
+
+def roll_dice():
+    print("\n--- Dice Roller ---")
+    num_dice = input("Roll 1 or 2 dice? (enter 1 or 2): ").strip()
+    
+    if num_dice not in ['1', '2']:
+        print("Invalid input. Rolling 1 die by default.")
+        num_dice = '1'
+
+    dice_faces = {
+        1: "[⚀]", 2: "[⚁]", 3: "[⚂]",
+        4: "[⚃]", 5: "[⚄]", 6: "[⚅]"
+    }
+
+    rolls = [random.randint(1, 6) for _ in range(int(num_dice))]
+    print("You rolled:", ' '.join(dice_faces[r] for r in rolls))
+    print(f"Total: {sum(rolls)}")
+
+if __name__ == "__main__":
+    roll_dice()
