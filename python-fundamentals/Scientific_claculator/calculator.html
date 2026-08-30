@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scientific Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1e1e1e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      margin: 0;
+    }
+
+    .calculator {
+      background-color: #2d2d2d;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0px 0px 10px #000;
+      width: 400px;
+    }
+
+    .screen {
+      background-color: #111;
+      padding: 20px;
+      font-size: 1.5em;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      min-height: 60px;
+      word-wrap: break-word;
+      text-align: right;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      padding: 15px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      background-color: #3a3a3a;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+
+    .equal {
+      background-color: #ff9500;
+      grid-column: span 2;
+    }
+
+    .clear {
+      background-color: #e74c3c;
+    }
+
+    .span-two {
+      grid-column: span 2;
+    }
+
+    .scientific {
+      background-color: #4a4a4a;
+    }
+
+    .trig {
+      background-color: #3a4a6b;
+    }
+
+    .log {
+      background-color: #4a6b3a;
+    }
+
+    .matrix {
+      background-color: #6b3a4a;
+    }
+
+    .advanced {
+      background-color: #3a6b6b;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+
+    .modal-content {
+      background-color: #2d2d2d;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 500px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: white;
+    }
+
+    .matrix-input {
+      width: 100%;
+      height: 100px;
+      margin: 10px 0;
+    }
+
+    .tab {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background-color: #3a3a3a;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 10px 16px;
+      transition: 0.3s;
+    }
+
+    .tab button:hover {
+      background-color: #555;
+    }
+
+    .tab button.active {
+      background-color: #666;
+    }
+
+    .tabcontent {
+      display: none;
+      padding: 6px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="screen" id="screen">0</div>
+    
+    <div class="tab">
+      <button class="tablinks active" onclick="openTab(event, 'Basic')">Basic</button>
+      <button class="tablinks" onclick="openTab(event, 'Scientific')">Scientific</button>
+      <button class="tablinks" onclick="openTab(event, 'Matrix')">Matrix</button>
+    </div>
+
+    <div id="Basic" class="tabcontent" style="display: block;">
+      <div class="buttons">
+        <button onclick="clearScreen()" class="clear">C</button>
+        <button onclick="backspace()">⌫</button>
+        <button onclick="appendOperator('%')">%</button>
+        <button onclick="appendOperator('/')">÷</button>
+
+        <button onclick="appendNumber('7')">7</button>
+        <button onclick="appendNumber('8')">8</button>
+        <button onclick="appendNumber('9')">9</button>
+        <button onclick="appendOperator('*')">×</button>
+
+        <button onclick="appendNumber('4')">4</button>
+        <button onclick="appendNumber('5')">5</button>
+        <button onclick="appendNumber('6')">6</button>
+        <button onclick="appendOperator('-')">−</button>
+
+        <button onclick="appendNumber('1')">1</button>
+        <button onclick="appendNumber('2')">2</button>
+        <button onclick="appendNumber('3')">3</button>
+        <button onclick="appendOperator('+')">+</button>
+
+        <button onclick="appendNumber('0')" class="span-two">0</button>
+        <button onclick="appendDot()">.</button>
+        <button onclick="calculate()" class="equal">=</button>
+      </div>
+    </div>
+
+    <div id="Scientific" class="tabcontent">
+      <div class="buttons">
+        <button onclick="scientificFunc('sin')" class="trig">sin</button>
+        <button onclick="scientificFunc('cos')" class="trig">cos</button>
+        <button onclick="scientificFunc('tan')" class="trig">tan</button>
+        <button onclick="scientificFunc('asin')" class="trig">sin⁻¹</button>
+        <button onclick="scientificFunc('acos')" class="trig">cos⁻¹</button>
+
+        <button onclick="scientificFunc('tanh')" class="trig">tanh</button>
+        <button onclick="scientificFunc('sinh')" class="trig">sinh</button>
+        <button onclick="scientificFunc('cosh')" class="trig">cosh</button>
+        <button onclick="scientificFunc('atan')" class="trig">tan⁻¹</button>
+        <button onclick="scientificFunc('log10')" class="log">log₁₀</button>
+
+        <button onclick="scientificFunc('ln')" class="log">ln</button>
+        <button onclick="scientificFunc('log')" class="log">logₙ</button>
+        <button onclick="scientificFunc('sqrt')" class="advanced">√</button>
+        <button onclick="scientificFunc('cbrt')" class="advanced">∛</button>
+        <button onclick="scientificFunc('nthroot')" class="advanced">ⁿ√</button>
+
+        <button onclick="scientificFunc('^')" class="advanced">xʸ</button>
+        <button onclick="scientificFunc('fact')" class="advanced">x!</button>
+        <button onclick="scientificFunc('pi')" class="scientific">π</button>
+        <button onclick="scientificFunc('e')" class="scientific">e</button>
+        <button onclick="scientificFunc('mod')" class="scientific">mod</button>
+
+        <button onclick="scientificFunc('floor')" class="scientific">floor</button>
+        <button onclick="scientificFunc('ceil')" class="scientific">ceil</button>
+        <button onclick="scientificFunc('abs')" class="scientific">|x|</button>
+        <button onclick="scientificFunc('rand')" class="scientific">rand</button>
+        <button onclick="scientificFunc('deg2rad')" class="scientific">°→rad</button>
+      </div>
+    </div>
+
+    <div id="Matrix" class="tabcontent">
+      <div class="buttons">
+        <button onclick="matrixOperation('add')" class="matrix">A+B</button>
+        <button onclick="matrixOperation('sub')" class="matrix">A-B</button>
+        <button onclick="matrixOperation('mul')" class="matrix">A×B</button>
+        <button onclick="matrixOperation('det')" class="matrix">det(A)</button>
+        <button onclick="matrixOperation('inv')" class="matrix">A⁻¹</button>
+
+        <button onclick="matrixOperation('trans')" class="matrix">Aᵀ</button>
+        <button onclick="matrixOperation('rank')" class="matrix">rank(A)</button>
+        <button onclick="matrixOperation('trace')" class="matrix">tr(A)</button>
+        <button onclick="matrixOperation('eigen')" class="matrix">eigen(A)</button>
+        <button onclick="matrixOperation('solve')" class="matrix">solve Ax=b</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Matrix Input Modal -->
+  <div id="matrixModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3 id="modalTitle">Matrix Operation</h3>
+      <div id="matrixInputs">
+        <div id="matrix1Input">
+          <p>Enter Matrix A (format: 1,2,3;4,5,6 for 2x3 matrix):</p>
+          <textarea class="matrix-input" id="matrixA"></textarea>
+        </div>
+        <div id="matrix2Input" style="display:none;">
+          <p>Enter Matrix B:</p>
+          <textarea class="matrix-input" id="matrixB"></textarea>
+        </div>
+        <div id="vectorInput" style="display:none;">
+          <p>Enter Vector b (format: 1;2;3 for column vector):</p>
+          <textarea class="matrix-input" id="vectorB"></textarea>
+        </div>
+      </div>
+      <button onclick="performMatrixOperation()" style="width:100%;padding:10px;">Calculate</button>
+      <div id="matrixResult" style="margin-top:20px;padding:10px;background:#111;border-radius:5px;"></div>
+    </div>
+  </div>
+
+  <script>
+    let screen = document.getElementById("screen");
+    let currentInput = "";
+    let currentOperation = null;
+    let matrixOperationType = null;
+
+    // Tab functionality
+    function openTab(evt, tabName) {
+      let tabcontent = document.getElementsByClassName("tabcontent");
+      for (let i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      
+      let tablinks = document.getElementsByClassName("tablinks");
+      for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+
+    function updateScreen() {
+      screen.textContent = currentInput || "0";
+    }
+
+    function appendNumber(num) {
+      currentInput += num;
+      updateScreen();
+    }
+
+    function appendOperator(op) {
+      if (currentInput && !isNaN(currentInput.slice(-1))) {
+        currentInput += op;
+        updateScreen();
+      }
+    }
+
+    function appendDot() {
+      if (!currentInput.includes('.')) {
+        currentInput += '.';
+        updateScreen();
+      }
+    }
+
+    function clearScreen() {
+      currentInput = '';
+      updateScreen();
+    }
+
+    function backspace() {
+      currentInput = currentInput.slice(0, -1);
+      updateScreen();
+    }
+
+    function toRadians(deg) {
+      return deg * Math.PI / 180;
+    }
+
+    function toDegrees(rad) {
+      return rad * 180 / Math.PI;
+    }
+
+    function scientificFunc(func) {
+      try {
+        let value = currentInput ? eval(currentInput) : 0;
+        let result;
+        
+        switch(func) {
+          case 'sin': 
+            result = Math.sin(toRadians(value)); 
+            break;
+          case 'cos': 
+            result = Math.cos(toRadians(value)); 
+            break;
+          case 'tan': 
+            result = Math.tan(toRadians(value)); 
+            break;
+          case 'asin': 
+            if (value < -1 || value > 1) {
+              screen.textContent = "Domain Error";
+              return;
+            }
+            result = toDegrees(Math.asin(value)); 
+            break;
+          case 'acos': 
+            if (value < -1 || value > 1) {
+              screen.textContent = "Domain Error";
+              return;
+            }
+            result = toDegrees(Math.acos(value)); 
+            break;
+          case 'atan': 
+            result = toDegrees(Math.atan(value)); 
+            break;
+          case 'sinh': 
+            result = Math.sinh(value); 
+            break;
+          case 'cosh': 
+            result = Math.cosh(value); 
+            break;
+          case 'tanh': 
+            result = Math.tanh(value); 
+            break;
+          case 'log10': 
+            if (value <= 0) {
+              screen.textContent = "Domain Error";
+              return;
+            }
+            result = Math.log10(value); 
+            break;
+          case 'ln': 
+            if (value <= 0) {
+              screen.textContent = "Domain Error";
+              return;
+            }
+            result = Math.log(value); 
+            break;
+          case 'log': 
+            if (value <= 0) {
+              screen.textContent = "Domain Error";
+              return;
+            }
+            let base = prompt("Enter logarithm base:");
+            if (base <= 0 || base == 1) {
+              screen.textContent = "Base Error";
+              return;
+            }
+            result = Math.log(value) / Math.log(base); 
+            break;
+          case 'sqrt': 
+            if (value < 0) {
+              screen.textContent = "Domain Error";
+              return;
+            }
+            result = Math.sqrt(value); 
+            break;
+          case 'cbrt': 
+            result = Math.cbrt(value); 
+            break;
+          case 'nthroot': 
+            let n = prompt("Enter root degree (n):");
+            if (n == 0) {
+              screen.textContent = "Root Error";
+              return;
+            }
+            result = Math.pow(value, 1/n); 
+            break;
+          case '^': 
+            let exp = prompt("Enter exponent:");
+            result = Math.pow(value, Number(exp)); 
+            break;
+          case 'fact': 
+            if (value < 0 || !Number.isInteger(value)) {
+              screen.textContent = "Domain Error";
+              return;
+            }
+            result = factorial(value); 
+            break;
+          case 'pi': 
+            result = Math.PI; 
+            break;
+          case 'e': 
+            result = Math.E; 
+            break;
+          case 'mod': 
+            let mod = prompt("Enter modulus:");
+            result = value % mod; 
+            break;
+          case 'floor': 
+            result = Math.floor(value); 
+            break;
+          case 'ceil': 
+            result = Math.ceil(value); 
+            break;
+          case 'abs': 
+            result = Math.abs(value); 
+            break;
+          case 'rand': 
+            result = Math.random(); 
+            break;
+          case 'deg2rad': 
+            result = toRadians(value); 
+            break;
+        }
+        
+        currentInput = result.toString();
+        updateScreen();
+      } catch (err) {
+        screen.textContent = "Error";
+      }
+    }
+
+    function factorial(n) {
+      if (n === 0 || n === 1) return 1;
+      let result = 1;
+      for (let i = 2; i <= n; i++) {
+        result *= i;
+      }
+      return result;
+    }
+
+    function calculate() {
+      try {
+        currentInput = eval(currentInput).toString();
+        updateScreen();
+      } catch (e) {
+        screen.textContent = "Error";
+      }
+    }
+
+    // Matrix operations
+    function matrixOperation(op) {
+      matrixOperationType = op;
+      document.getElementById('modalTitle').textContent = 
+        op === 'add' ? 'Matrix Addition (A + B)' :
+        op === 'sub' ? 'Matrix Subtraction (A - B)' :
+        op === 'mul' ? 'Matrix Multiplication (A × B)' :
+        op === 'det' ? 'Matrix Determinant' :
+        op === 'inv' ? 'Matrix Inverse' :
+        op === 'trans' ? 'Matrix Transpose' :
+        op === 'rank' ? 'Matrix Rank' :
+        op === 'trace' ? 'Matrix Trace' :
+        op === 'eigen' ? 'Eigenvalues and Eigenvectors' :
+        'Solve Linear System (Ax = b)';
+      
+      document.getElementById('matrix1Input').style.display = 'block';
+      document.getElementById('matrix2Input').style.display = 
+        (op === 'add' || op === 'sub' || op === 'mul') ? 'block' : 'none';
+      document.getElementById('vectorInput').style.display = 
+        (op === 'solve') ? 'block' : 'none';
+      
+      document.getElementById('matrixA').value = '';
+      document.getElementById('matrixB').value = '';
+      document.getElementById('vectorB').value = '';
+      document.getElementById('matrixResult').innerHTML = '';
+      
+      document.getElementById('matrixModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('matrixModal').style.display = 'none';
+    }
+
+    function parseMatrix(input) {
+      try {
+        // Remove all whitespace
+        input = input.replace(/\s/g, '');
+        
+        // Split into rows
+        let rows = input.split(';');
+        let matrix = [];
+        
+        for (let i = 0; i < rows.length; i++) {
+          let row = rows[i].split(',');
+          let numRow = [];
+          
+          for (let j = 0; j < row.length; j++) {
+            numRow.push(parseFloat(row[j]));
+          }
+          
+          matrix.push(numRow);
+        }
+        
+        return matrix;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function matrixToString(matrix) {
+      return matrix.map(row => row.join(', ')).join('<br>');
+    }
+
+    function performMatrixOperation() {
+      let matrixAInput = document.getElementById('matrixA').value;
+      let matrixBInput = document.getElementById('matrixB').value;
+      let vectorBInput = document.getElementById('vectorB').value;
+      
+      let matrixA = parseMatrix(matrixAInput);
+      if (!matrixA) {
+        document.getElementById('matrixResult').innerHTML = "Invalid matrix A format";
+        return;
+      }
+      
+      let matrixB, vectorB;
+      
+      if (matrixOperationType === 'add' || matrixOperationType === 'sub' || matrixOperationType === 'mul') {
+        matrixB = parseMatrix(matrixBInput);
+        if (!matrixB) {
+          document.getElementById('matrixResult').innerHTML = "Invalid matrix B format";
+          return;
+        }
+      }
+      
+      if (matrixOperationType === 'solve') {
+        vectorB = parseMatrix(vectorBInput);
+        if (!vectorB || vectorB[0].length !== 1) {
+          document.getElementById('matrixResult').innerHTML = "Invalid vector b format (should be column vector)";
+          return;
+        }
+      }
+      
+      try {
+        let resultHTML = "";
+        
+        switch(matrixOperationType) {
+          case 'add':
+            if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+              resultHTML = "Matrices must have same dimensions for addition";
+              break;
+            }
+            let sum = matrixAdd(matrixA, matrixB);
+            resultHTML = "A + B =<br>" + matrixToString(sum);
+            break;
+            
+          case 'sub':
+            if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+              resultHTML = "Matrices must have same dimensions for subtraction";
+              break;
+            }
+            let diff = matrixSubtract(matrixA, matrixB);
+            resultHTML = "A - B =<br>" + matrixToString(diff);
+            break;
+            
+          case 'mul':
+            if (matrixA[0].length !== matrixB.length) {
+              resultHTML = "Number of columns in A must match rows in B";
+              break;
+            }
+            let product = matrixMultiply(matrixA, matrixB);
+            resultHTML = "A × B =<br>" + matrixToString(product);
+            break;
+            
+          case 'det':
+            if (matrixA.length !== matrixA[0].length) {
+              resultHTML = "Matrix must be square to calculate determinant";
+              break;
+            }
+            let det = matrixDeterminant(matrixA);
+            resultHTML = "det(A) = " + det;
+            break;
+            
+          case 'inv':
+            if (matrixA.length !== matrixA[0].length) {
+              resultHTML = "Matrix must be square to calculate inverse";
+              break;
+            }
+            let inv = matrixInverse(matrixA);
+            if (!inv) {
+              resultHTML = "Matrix is singular (no inverse)";
+            } else {
+              resultHTML = "A⁻¹ =<br>" + matrixToString(inv);
+            }
+            break;
+            
+          case 'trans':
+            let trans = matrixTranspose(matrixA);
+            resultHTML = "Aᵀ =<br>" + matrixToString(trans);
+            break;
+            
+          case 'rank':
+            let rank = matrixRank(matrixA);
+            resultHTML = "rank(A) = " + rank;
+            break;
+            
+          case 'trace':
+            if (matrixA.length !== matrixA[0].length) {
+              resultHTML = "Matrix must be square to calculate trace";
+              break;
+            }
+            let trace = matrixTrace(matrixA);
+            resultHTML = "tr(A) = " + trace;
+            break;
+            
+          case 'eigen':
+            if (matrixA.length !== matrixA[0].length) {
+              resultHTML = "Matrix must be square to calculate eigenvalues";
+              break;
+            }
+            let eigen = matrixEigen(matrixA);
+            if (!eigen) {
+              resultHTML = "Could not compute eigenvalues";
+            } else {
+              resultHTML = "Eigenvalues:<br>" + eigen.values.join(', ') + 
+                           "<br><br>Eigenvectors (columns):<br>" + 
+                           matrixToString(eigen.vectors);
+            }
+            break;
+            
+          case 'solve':
+            if (matrixA.length !== matrixA[0].length) {
+              resultHTML = "Coefficient matrix must be square";
+              break;
+            }
+            if (matrixA.length !== vectorB.length) {
+              resultHTML = "Number of rows in A must match rows in b";
+              break;
+            }
+            let solution = solveLinearSystem(matrixA, vectorB);
+            if (!solution) {
+              resultHTML = "System has no unique solution";
+            } else {
+              resultHTML = "Solution x:<br>";
+              for (let i = 0; i < solution.length; i++) {
+                resultHTML += "x" + (i+1) + " = " + solution[i][0] + "<br>";
+              }
+            }
+            break;
+        }
+        
+        document.getElementById('matrixResult').innerHTML = resultHTML;
+      } catch (e) {
+        document.getElementById('matrixResult').innerHTML = "Error: " + e.message;
+      }
+    }
+
+    // Basic matrix operations
+    function matrixAdd(a, b) {
+      let result = [];
+      for (let i = 0; i < a.length; i++) {
+        result[i] = [];
+        for (let j = 0; j < a[i].length; j++) {
+          result[i][j] = a[i][j] + b[i][j];
+        }
+      }
+      return result;
+    }
+
+    function matrixSubtract(a, b) {
+      let result = [];
+      for (let i = 0; i < a.length; i++) {
+        result[i] = [];
+        for (let j = 0; j < a[i].length; j++) {
+          result[i][j] = a[i][j] - b[i][j];
+        }
+      }
+      return result;
+    }
+
+    function matrixMultiply(a, b) {
+      let result = [];
+      for (let i = 0; i < a.length; i++) {
+        result[i] = [];
+        for (let j = 0; j < b[0].length; j++) {
+          let sum = 0;
+          for (let k = 0; k < a[0].length; k++) {
+            sum += a[i][k] * b[k][j];
+          }
+          result[i][j] = sum;
+        }
+      }
+      return result;
+    }
+
+    function matrixTranspose(a) {
+      let result = [];
+      for (let j = 0; j < a[0].length; j++) {
+        result[j] = [];
+        for (let i = 0; i < a.length; i++) {
+          result[j][i] = a[i][j];
+        }
+      }
+      return result;
+    }
+
+    function matrixTrace(a) {
+      let trace = 0;
+      for (let i = 0; i < a.length; i++) {
+        trace += a[i][i];
+      }
+      return trace;
+    }
+
+    // More advanced matrix operations (simplified implementations)
+    function matrixDeterminant(a) {
+      // Simple implementation for 2x2 and 3x3 matrices
+      if (a.length === 2 && a[0].length === 2) {
+        return a[0][0] * a[1][1] - a[0][1] * a[1][0];
+      } else if (a.length === 3 && a[0].length === 3) {
+        return a[0][0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]) -
+               a[0][1] * (a[1][0] * a[2][2] - a[1][2] * a[2][0]) +
+               a[0][2] * (a[1][0] * a[2][1] - a[1][1] * a[2][0]);
+      } else {
+        // For larger matrices, use recursive approach (Laplace expansion)
+        if (a.length !== a[0].length) return 0;
+        if (a.length === 1) return a[0][0];
+        
+        let det = 0;
+        for (let i = 0; i < a.length; i++) {
+          let minor = [];
+          for (let j = 1; j < a.length; j++) {
+            minor.push(a[j].filter((val, idx) => idx !== i));
+          }
+          det += a[0][i] * Math.pow(-1, i) * matrixDeterminant(minor);
+        }
+        return det;
+      }
+    }
+
+    function matrixInverse(a) {
+      let det = matrixDeterminant(a);
+      if (det === 0) return null;
+      
+      // Simple implementation for 2x2 matrix
+      if (a.length === 2 && a[0].length === 2) {
+        return [
+          [a[1][1]/det, -a[0][1]/det],
+          [-a[1][0]/det, a[0][0]/det]
+        ];
+      }
+      
+      // For larger matrices, use adjugate method
+      let n = a.length;
+      let adj = [];
+      for (let i = 0; i < n; i++) {
+        adj[i] = [];
+        for (let j = 0; j < n; j++) {
+          let minor = [];
+          for (let k = 0; k < n; k++) {
+            if (k === i) continue;
+            let row = [];
+            for (let l = 0; l < n; l++) {
+              if (l === j) continue;
+              row.push(a[k][l]);
+            }
+            minor.push(row);
+          }
+          adj[i][j] = Math.pow(-1, i+j) * matrixDeterminant(minor);
+        }
+      }
+      
+      // Transpose the adjugate matrix
+      adj = matrixTranspose(adj);
+      
+      // Divide by determinant
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          adj[i][j] /= det;
+        }
+      }
+      
+      return adj;
+    }
+
+    function matrixRank(a) {
+      // Simplified implementation using row reduction
+      let rank = 0;
+      let rows = a.length;
+      let cols = a[0].length;
+      let matrix = JSON.parse(JSON.stringify(a)); // Deep copy
+      
+      for (let col = 0; col < cols && rank < rows; col++) {
+        // Find the pivot row
+        let pivot = rank;
+        while (pivot < rows && matrix[pivot][col] === 0) {
+          pivot++;
+        }
+        
+        if (pivot === rows) continue; // No pivot in this column
+        
+        // Swap rows if necessary
+        if (pivot !== rank) {
+          let temp = matrix[rank];
+          matrix[rank] = matrix[pivot];
+          matrix[pivot] = temp;
+        }
+        
+        // Eliminate this column in other rows
+        for (let i = rank + 1; i < rows; i++) {
+          let factor = matrix[i][col] / matrix[rank][col];
+          for (let j = col; j < cols; j++) {
+            matrix[i][j] -= factor * matrix[rank][j];
+          }
+        }
+        
+        rank++;
+      }
+      
+      return rank;
+    }
+
+    function matrixEigen(a) {
+      // Very simplified implementation for 2x2 matrices only
+      if (a.length !== 2 || a[0].length !== 2) {
+        return null;
+      }
+      
+      // For 2x2 matrix, eigenvalues are roots of characteristic polynomial
+      // λ² - (a+d)λ + (ad - bc) = 0
+      let b = a[0][1];
+      let c = a[1][0];
+      let trace = a[0][0] + a[1][1];
+      let det = a[0][0] * a[1][1] - b * c;
+      
+      let discriminant = trace * trace - 4 * det;
+      if (discriminant < 0) {
+        return null; // Complex eigenvalues
+      }
+      
+      let lambda1 = (trace + Math.sqrt(discriminant)) / 2;
+      let lambda2 = (trace - Math.sqrt(discriminant)) / 2;
+      
+      // Very simplified eigenvectors (not general solution)
+      let v1 = [1, (lambda1 - a[0][0]) / b || 0];
+      let v2 = [1, (lambda2 - a[0][0]) / b || 0];
+      
+      return {
+        values: [lambda1, lambda2],
+        vectors: [v1, v2]
+      };
+    }
+
+    function solveLinearSystem(a, b) {
+      // Using matrix inverse method (not numerically stable for large systems)
+      let invA = matrixInverse(a);
+      if (!invA) return null;
+      
+      return matrixMultiply(invA, b);
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+      if (event.target == document.getElementById('matrixModal')) {
+        closeModal();
+      }
+    }
+  </script>
+</body>
+</html>
