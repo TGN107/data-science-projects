@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guess the Number Game</title>
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      padding: 50px;
+      margin: 0;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .game-box {
+      background-color: white;
+      padding: 30px;
+      margin: 0 auto;
+      width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    input[type="number"] {
+      padding: 10px;
+      width: 80%;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .message {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #555;
+    }
+
+    /* Footer styles */
+    .footer {
+      margin-top: 60px;
+      padding: 20px;
+      background-color: #333;
+      color: #fff;
+      border-radius: 12px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .quote {
+      font-style: italic;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: #f1c40f;
+    }
+
+    .signature {
+      font-weight: bold;
+      font-size: 1rem;
+      color: #ecf0f1;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-box">
+    <h1>🎯 Guess the Number!</h1>
+    <p>I have selected a number between <strong>1 and 100</strong>. Can you guess it?</p>
+    <input type="number" id="guessInput" placeholder="Enter your guess" />
+    <br />
+    <button onclick="checkGuess()">Guess</button>
+    <div class="message" id="message"></div>
+  </div>
+
+  <div class="footer">
+    <div class="quote">“Enthusiasm is the sparkle in your eyes, the swing in your gait.”</div>
+    <div class="signature">@Tehreem Ghulam Nabi</div>
+  </div>
+
+  <!-- Confetti library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    const randomNumber = Math.floor(Math.random() * 100) + 1;
+    let attempts = 0;
+
+    function checkGuess() {
+      const userInput = document.getElementById("guessInput").value;
+      const guess = parseInt(userInput);
+      const message = document.getElementById("message");
+
+      if (isNaN(guess)) {
+        message.textContent = "❌ Please enter a valid number.";
+        return;
+      }
+
+      attempts++;
+
+      if (guess < randomNumber) {
+        message.textContent = "📉 Too low! Try again.";
+      } else if (guess > randomNumber) {
+        message.textContent = "📈 Too high! Try again.";
+      } else {
+        message.textContent = `🎉 Congratulations! You guessed the number ${randomNumber} in ${attempts} attempts.`;
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+  </script>
+</body>
+</html>
